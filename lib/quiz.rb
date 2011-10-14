@@ -24,10 +24,28 @@ class Robut::Plugin::Quiz
   def handle(time, sender_nick, message)
     
     # check to see if the user is asking the bot a question
+    request = words(message).join(" ")
     
-    if sent_to_me? message and is_a_question? message
+    if sent_to_me? message and is_a_valid_question? request
+      request =~ QUESTION_REGEX
       
+      question_type = Regexp.last_match(1) || 'choice'
+      question = Regexp.last_match(2)
+      parameters = Regexp.last_match(3)
+      answer_length = Regexp.last_match(4) || '2'
       
+      puts %{ #{question_type} }
+      
+      case question_type
+      when 'polar'
+        handle_polar(question,parameters,answer_length)
+      when 'choice'
+        handle_choice(question,parameters,answer_length)
+      when 'scale'
+        handle_scale(question,parameters,answer_length)
+      else
+        puts "failed to find a question type"
+      end
       
       
     end
@@ -38,8 +56,20 @@ class Robut::Plugin::Quiz
     
   end
   
+  def handle_polar(question,parameters,length)
+    puts "#{question} #{parameters} #{length}"
+  end
+  
+  def handle_choice(question,parameters,length)
+    puts "#{question} #{parameters} #{length}"
+  end
+  
+  def handle_scale(question,parameters,length)
+    puts "#{question} #{parameters} #{length}"
+  end
+  
   def is_a_valid_question? message
-    message =~ QUESTION_REGEX
+    QUESTION_REGEX =~ message
   end
   
 end

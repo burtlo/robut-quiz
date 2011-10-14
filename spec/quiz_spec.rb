@@ -24,5 +24,31 @@ describe Robut::Plugin::Quiz do
     end
     
   end
+  
+  describe "#handle" do
+    
+    context "when a polar question is asked" do
+      
+      it "should find all the components of the question" do
+
+        subject.should_receive(:handle_polar).with('Should I continue the presentation?',nil,'3')
+        subject.handle Time.now,'person',"@quizmaster ask polar 'Should I continue the presentation?' for 3 minutes"
+        
+      end
+      
+    end
+    
+    context "when a choice question is asked" do
+      
+      it "should find all the components of the question" do
+        
+        subject.should_receive(:handle_choice).with('What should I talk about next?',"'x', 'y', 'z'",'2')
+        subject.handle Time.now,'person',"@quizmaster ask choice 'What should I talk about next?', 'x', 'y', 'z'"
+        
+      end
+      
+    end
+    
+  end
     
 end
