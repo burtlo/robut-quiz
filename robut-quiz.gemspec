@@ -38,18 +38,18 @@ Gem::Specification.new do |s|
   
   changes = Robut::Plugin::Quiz.show_version_changes(::Robut::Plugin::Quiz::VERSION)
   
-  s.post_install_message = %{
+  s.post_install_message = "
 --------------------------------------------------------------------------------
     ___
   !(O-0)! ~ Thank you for installing robut-quiz #{::Robut::Plugin::Quiz::VERSION} / #{changes[:date]}
- \}==[ ]==\{
+ >==[ ]==<
     @ @
 
   Changes:
   #{changes[:changes].collect{|change| "  #{change}"}.join("")}
---------------------------------------------------------------------------------}
+--------------------------------------------------------------------------------"
 
-  s.add_dependency 'robut', '~> 0.4'
+  s.add_dependency 'robut', '~> 0.3'
   
   s.rubygems_version   = "1.3.7"
   s.files            = `git ls-files`.split("\n")
