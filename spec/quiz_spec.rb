@@ -44,6 +44,40 @@ describe Robut::Plugin::Quiz do
       
     end
     
+    context "when currently asking a question" do
+      
+      context "when the response is not an answer to the question" do
+        
+        it "should not process response for the question" do
+          
+          subject.stub(:currently_asking_a_question?).and_return(true)
+          subject.stub(:is_a_valid_response?).and_return(false)
+
+          subject.should_not_receive(:process_response_for_active_question)
+          
+          subject.handle time,'person',"@quizmaster ask polar 'Should I continue the presentation?' for 3 minutes"
+          
+        end
+        
+      end
+      
+      context "when the response is an answer to the question" do
+        
+        it "should process response for the question" do
+          subject.stub(:sent_to_me?).and_return(true)
+          subject.stub(:currently_asking_a_question?).and_return(true)
+          subject.stub(:is_a_valid_response?).and_return(true)
+
+          subject.should_receive(:process_response_for_active_question)
+          
+          subject.handle time,'person',"@quizmaster ask polar 'Should I continue the presentation?' for 3 minutes"
+          
+        end
+        
+      end
+      
+    end
+    
   end
   
   
@@ -87,7 +121,7 @@ describe Robut::Plugin::Quiz do
     
     it "should ask the question" do
       
-      question.should_receive(:ask_question)
+      question.should_receive(:ask)
       subject.set_current_question(question,'3')
       
     end

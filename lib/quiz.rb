@@ -5,7 +5,8 @@ class Robut::Plugin::Quiz
   include Robut::Plugin
   
   QUESTION_REGEX = /^ask ?(choice|polar|scale)? (?:question )?.+(?:(?:for )?(\d+) minutes?)$/
-
+  ANSWER_REGEX = /^answer .+$/
+  
   def usage
     [ 
       "#{at_nick} ask choice question 'What do you want for lunch?', 'pizza', 'sandwich', 'salad' for 1 minute",
@@ -26,7 +27,7 @@ class Robut::Plugin::Quiz
       
     end
     
-    if sent_to_me? message and currently_asking_a_question?
+    if sent_to_me? message and currently_asking_a_question? and is_a_valid_response? request
       
       process_response_for_active_question time, sender_nick, request
       
@@ -38,12 +39,15 @@ class Robut::Plugin::Quiz
     QUESTION_REGEX =~ message
   end
   
+  def is_a_valid_response? message
+    ANSWER_REGEX =~ message
+  end
+  
   def enqueue_the_question(time,sender,question)
     # enqueue the question with a unique identifier
     (store["quiz::question_queue"] ||= []) << [time,sender,question]
     # start a worker thread unless one has already been started
   end
-  
   
   # if there are no active questions then ask the question
   # TODO: create the question worker
@@ -69,7 +73,7 @@ class Robut::Plugin::Quiz
     
     start_accepting_responses_for_this_question question
     
-    reply question.ask_question
+    reply question.ask
     
     sleep length_of_time.to_i * 60
     
@@ -133,11 +137,14 @@ end
 class Robut::Plugin::Quiz::Polar
   include Robut::Plugin::Quiz::Question
   
-  def ask_question
+  def ask
     "@#{@sender} asks '#{@question}' (yes/no)"
   end
   
   def handle_response(time,sender_nick,response)
+    
+    
+    
     # process a yes/no y/n - store results per user
   end
   
