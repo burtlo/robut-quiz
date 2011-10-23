@@ -10,8 +10,10 @@ class Robut::Plugin::Quiz::Polar
     
     if response =~ YES_ANSWER
       store_positive_response_for sender_nick
+      true
     elsif response =~ NO_ANSWER
       store_negative_response_for sender_nick
+      true
     else
       nil
     end

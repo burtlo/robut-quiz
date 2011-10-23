@@ -18,7 +18,7 @@ class Robut::Plugin::Quiz
     if sent_to_me? message and is_a_valid_question? request
       
       enqueue_the_question sender_nick, request
-      reply "@#{sender_nick}, I have enqueued your question"
+      reply "@#{sender_nick}, I have added your question to the list."
       quizmaster
       
     end
@@ -27,8 +27,6 @@ class Robut::Plugin::Quiz
       process_response_for_active_question sender_nick, request
     end
     
-  rescue => exception
-    reply "Problem: #{exception}"
   end
   
   QUESTION_REGEX = /^ask ?(choice|polar|scale)? (?:question )?.+(?:(?:for )?(\d+) minutes?)$/
@@ -109,9 +107,9 @@ class Robut::Plugin::Quiz
   
   def process_response_for_active_question(sender_nick, request)
     if @@current_question.handle_response sender_nick, request
-      reply "@#{sender_nick} I have received a response"
+      reply "Thank you, @#{sender_nick}, I have recorded your response."
     else
-      reply "@#{sender_nick} I did not understand that answer"
+      reply "Sorry, @#{sender_nick}, I was unable to record that answer"
     end
   end
   
