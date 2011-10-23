@@ -4,23 +4,13 @@ require 'robut'
 class Robut::Plugin::Quiz
   include Robut::Plugin
   
-  # @see ask%20%3F(choice%7Cpolar%7Cscale)%3F%20(%3F%3Aquestion%20)%3F'(%5B%5E'%5D%2B)'%5B%5Cs%2C%5D*((%3F%3A'%5B%5E'%5D%2B'%5B%5Cs%2C%5D*)*)%2B(%3F%3A(%3F%3Afor%20)%3F(%5Cd%2B)%20minutes%3F)%3F
-  # 
-  # 1st: question type - choice, polar, scale
-  # 2nd: question
-  # 3rd: choices 
-  # 
-  QUESTION_REGEX = /^ask ?(choice|polar|scale)? (?:question )?'([^']+)'[\s,]*((?:'[^']+'[\s,]*)*)*(?:(?:for )?(\d+) minutes?)?$/
-  
-  # This regex will find all the questions and parameters specified with the question 
-  GROUP_REGEX = /'([^']+)'/ 
-  
+  QUESTION_REGEX = /^ask ?(choice|polar|scale)? (?:question )?.+(?:(?:for )?(\d+) minutes?)$/
 
   def usage
     [ 
       "#{at_nick} ask choice question 'What do you want for lunch?', 'pizza', 'sandwich', 'salad' for 1 minute",
       "#{at_nick} ask polar 'Should I continue the presentation?' for 3 minutes",
-      "#{at_nick} ask scale 'how much did you like the presentation?', '1..5'",
+      "#{at_nick} ask scale 'how much did you like the presentation?', '1..5' for 2 minutes",
       "#{at_nick} ask 'Should I continue the presentation?', 'y|yes', 'n|no' for 1 minutes"
     ]
   end
@@ -59,20 +49,71 @@ class Robut::Plugin::Quiz
   # TODO: create the question worker
   
   def currently_asking_a_question?
-    @currently_asking_a_question
+    @current_question
   end
   
   def process_the_question(time,sender,request)
     
     request =~ QUESTION_REGEX
+    type = Regexp.last_match(1) || 'polar'
+    question_length = Regexp.last_match(2) || '2' 
     
-    question_type = Regexp.last_match(1) || 'choice'
-    question = Regexp.last_match(2)
-    answer_length = Regexp.last_match(4) || '2 minutes'
+    set_current_question create_the_question_based_on_type(type,sender,request), question_length
+  end
+  
+  def create_the_question_based_on_type(question_type,sender,request)
+    self.class.const_get(question_type.capitalize).new sender, request
+  end
+  
+  def set_current_question(question,length_of_time)
+    
+    start_accepting_responses_for_this_question question
+    
+    reply question.ask_question
+    
+    sleep length_of_time.to_i * 60
+    
+    stop_accepting_responses_for_this_question question
+    
+    question.declare_results
+    
+  end
+  
+  def start_accepting_responses_for_this_question(question)
+    @current_question = question
+  end
+  
+  def stop_accepting_responses_for_this_question(question)
+    @current_question = nil
+  end
+  
+end
 
+module Robut::Plugin::Quiz::Question
+  
+  # @see ask%20%3F(choice%7Cpolar%7Cscale)%3F%20(%3F%3Aquestion%20)%3F'(%5B%5E'%5D%2B)'%5B%5Cs%2C%5D*((%3F%3A'%5B%5E'%5D%2B'%5B%5Cs%2C%5D*)*)%2B(%3F%3A(%3F%3Afor%20)%3F(%5Cd%2B)%20minutes%3F)%3F
+  # 
+  # 1st: question type - choice, polar, scale
+  # 2nd: question
+  # 3rd: choices 
+  #
+  QUESTION_REGEX = /^ask ?(choice|polar|scale)? (?:question )?'([^']+)'[\s,]*((?:'[^']+'[\s,]*)*)*(?:(?:for )?(\d+) minutes?)?$/
+  
+  # This regex will find all the questions and parameters specified with the question 
+  GROUP_REGEX = /'([^']+)'/ 
+  
+  def initialize(sender,request)
+    @sender = sender
+    process_question(request)
+  end
+  
+  def process_question(request)
+    
+    request =~ QUESTION_REGEX
+    @question = Regexp.last_match(2)
     # After the target, question type, question, and answer length has been determined
     # look at all the single quoted items to find the list of parameters if there are any
-    parameters = request.scan(GROUP_REGEX)[1..-1].flatten
+    @parameters = request.scan(GROUP_REGEX)[1..-1].flatten
     
     # puts "Request: #{request}"
     # puts %{ 
@@ -81,53 +122,22 @@ class Robut::Plugin::Quiz
     #   parameters: #{parameters} 
     #   time:       #{answer_length} }
     
-    
-    case question_type
-    when 'polar'
-      handle_polar(sender,question,answer_length)
-    when 'choice'
-      handle_choice(question,parameters,answer_length)
-    when 'scale'
-      handle_scale(question,parameters,answer_length)
-    else
-      puts "failed to find a question type"
-    end
-    
-    
   end
   
-  def handle_polar(sender,question,length)
-    
-    start_accepting_responses_for_this_question
-    
-    reply "@#{sender} asks '#{question}' (yes/no)"
-    # starting a timer to take robut out of response mode
-    # set up a timer for the length of time
-    
-    sleep length.to_i * 60
-    # when timer is done - take robut out of response mode
-    
-    stop_accepting_responses_for_this_question
-    # # collect results from the question
-    # send the results to the person that asked the question
-    
-    process_results_for_question sender, question
-    
+end
+
+class Robut::Plugin::Quiz::Polar
+  include Robut::Plugin::Quiz::Question
+  
+  def ask_question
+    "@#{@sender} asks '#{@question}' (yes/no)"
   end
   
-  def start_accepting_responses_for_this_question
-    @currently_asking_a_question = true
+  def handle_response(time,sender_nick,response)
+    # process a yes/no y/n - store results per user
   end
   
-  def stop_accepting_responses_for_this_question
-    @currently_asking_a_question = false
-  end
-  
-  def process_response_for_active_question(time,sender,request)
-    
-  end
-  
-  def process_results_for_question(sender,question)
+  def declare_results
     
   end
   

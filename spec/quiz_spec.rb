@@ -17,7 +17,7 @@ describe Robut::Plugin::Quiz do
   [ 
     "ask choice 'What do you want for lunch?', 'pizza', 'sandwich', 'salad' for 1 minute",
     "ask polar 'Should I continue the presentation?' for 3 minutes",
-    "ask scale question 'how much did you like the presentation?', '1..5'",
+    "ask scale question 'how much did you like the presentation?', '1..5' for 10 minutes",
     "ask 'Should I continue the presentation?', 'y|yes', 'n|no' for 1 minutes",
     "ask polar 'Should I continue the presentation?' for 3 minutes"
     
@@ -54,7 +54,11 @@ describe Robut::Plugin::Quiz do
       
       it "should find all the components of the question" do
         
-        subject.should_receive(:handle_polar).with('person','Should I continue the presentation?','3')
+        expected_question = Robut::Plugin::Quiz::Polar.new 'person',"ask polar 'Should I continue the presentation?' for 3 minutes"
+        
+        subject.should_receive(:create_the_question_based_on_type).and_return(expected_question)
+        
+        subject.should_receive(:set_current_question).with(expected_question,'3')
         subject.process_the_question time,'person',"ask polar 'Should I continue the presentation?' for 3 minutes"
         
       end
@@ -64,30 +68,34 @@ describe Robut::Plugin::Quiz do
   end
 
 
-  describe "#handle_polar" do
+  describe "#set_current_question" do
     
     before :each do
       subject.stub(:sleep)
     end
     
+    let(:question) do
+      Robut::Plugin::Quiz::Polar.new 'person',"ask polar 'Should I continue the presentation?' for 3 minutes"
+    end
+    
     it "should place robut in the mode where it is asking a question" do
       
       subject.should_receive(:start_accepting_responses_for_this_question)
-      subject.handle_polar('person','Should I continue the presentation?','3')
+      subject.set_current_question(question,'3')
       
     end
     
     it "should ask the question" do
       
-      subject.should_receive(:reply).with("@person asks 'Should I continue the presentation?' (yes/no)")
-      subject.handle_polar('person','Should I continue the presentation?','3')
+      question.should_receive(:ask_question)
+      subject.set_current_question(question,'3')
       
     end
     
     it "should wait until the question time is done" do
       
       subject.should_receive(:sleep).with(180)
-      subject.handle_polar('person','Should I continue the presentation?','3')
+      subject.set_current_question(question,'3')
       
     end
     
@@ -96,14 +104,14 @@ describe Robut::Plugin::Quiz do
       it "should take robut out of the mdoe where it is asking a question" do
         
         subject.should_receive(:stop_accepting_responses_for_this_question)
-        subject.handle_polar('person','Should I continue the presentation?','3')
+        subject.set_current_question(question,'3')
         
       end
       
       it "should process the results for the question" do
         
-        subject.should_receive(:process_results_for_question).with("person",'Should I continue the presentation?')
-        subject.handle_polar('person','Should I continue the presentation?','3')
+        question.should_receive(:declare_results)
+        subject.set_current_question(question,'3')
         
       end
       
