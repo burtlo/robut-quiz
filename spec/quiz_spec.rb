@@ -37,7 +37,7 @@ describe Robut::Plugin::Quiz do
       
       it "should be enqueued to be asked" do
         
-        subject.should_receive(:enqueue_the_question).with(time,'person',"ask polar 'Should I continue the presentation?' for 3 minutes")
+        subject.should_receive(:enqueue_the_question).with('person',"ask polar 'Should I continue the presentation?' for 3 minutes")
         subject.handle time,'person',"@quizmaster ask polar 'Should I continue the presentation?' for 3 minutes"
         
       end
@@ -93,7 +93,7 @@ describe Robut::Plugin::Quiz do
         subject.should_receive(:create_the_question_based_on_type).and_return(expected_question)
         
         subject.should_receive(:set_current_question).with(expected_question,'3')
-        subject.process_the_question time,'person',"ask polar 'Should I continue the presentation?' for 3 minutes"
+        subject.process_the_question 'person',"ask polar 'Should I continue the presentation?' for 3 minutes"
         
       end
       
@@ -171,7 +171,7 @@ describe Robut::Plugin::Quiz::Polar do
       it "should store positive response for the user" do
         
         subject.should_receive(:store_positive_response_for).with('person')
-        subject.handle_response(time,'person','yes')
+        subject.handle_response('person','yes')
         
       end
       
@@ -182,7 +182,7 @@ describe Robut::Plugin::Quiz::Polar do
       it "should store a positive response for the user" do
         
         subject.should_receive(:store_positive_response_for).with('person')
-        subject.handle_response(time,'person','y')
+        subject.handle_response('person','y')
 
       end
     end
@@ -192,7 +192,7 @@ describe Robut::Plugin::Quiz::Polar do
       it "should store negative response for the user" do
         
         subject.should_receive(:store_negative_response_for).with('person')
-        subject.handle_response(time,'person','no')
+        subject.handle_response('person','no')
         
       end
       
@@ -203,7 +203,7 @@ describe Robut::Plugin::Quiz::Polar do
       it "should store negative response for the user" do
       
         subject.should_receive(:store_negative_response_for).with('person')
-        subject.handle_response(time,'person','n')
+        subject.handle_response('person','n')
         
       end
       
@@ -227,7 +227,7 @@ describe Robut::Plugin::Quiz::Polar do
       
       it "should reply that there is 1 YES vote" do
         
-        subject.handle_response(time,'person','yes')
+        subject.handle_response('person','yes')
         subject.results.should eq "1 YES vote and 0 NO votes"
         
       end
@@ -238,7 +238,7 @@ describe Robut::Plugin::Quiz::Polar do
       
       it "should reply that there is 1 NO vote" do
         
-        subject.handle_response(time,'person','no')
+        subject.handle_response('person','no')
         subject.results.should eq "0 YES votes and 1 NO vote"
         
       end
@@ -249,18 +249,18 @@ describe Robut::Plugin::Quiz::Polar do
       
       it "should count as one vote" do
         
-        subject.handle_response(time,'person','no')
-        subject.handle_response(time,'person','no')
-        subject.handle_response(time,'person','no')
+        subject.handle_response('person','no')
+        subject.handle_response('person','no')
+        subject.handle_response('person','no')
         subject.results.should eq "0 YES votes and 1 NO vote"
         
       end
 
       it "should only count the last vote" do
         
-        subject.handle_response(time,'person','yes')
-        subject.handle_response(time,'person','yes')
-        subject.handle_response(time,'person','no')
+        subject.handle_response('person','yes')
+        subject.handle_response('person','yes``')
+        subject.handle_response('person','no')
         subject.results.should eq "0 YES votes and 1 NO vote"
         
       end
