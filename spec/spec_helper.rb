@@ -1,1 +1,1 @@
-require_relative '../lib/quiz'
+require_relative '../lib/robut_quiz'

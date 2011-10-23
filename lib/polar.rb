@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 class Robut::Plugin::Quiz::Polar
   include Robut::Plugin::Quiz::Question
   
