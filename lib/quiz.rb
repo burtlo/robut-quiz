@@ -87,6 +87,10 @@ class Robut::Plugin::Quiz
     @current_question = nil
   end
   
+  def process_response_for_active_question(time,sender_nick, request)
+    @current_question.handle_response time, sender_nick, request
+  end
+  
 end
 
 module Robut::Plugin::Quiz::Question
