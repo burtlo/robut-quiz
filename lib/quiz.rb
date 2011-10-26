@@ -5,7 +5,7 @@ class Robut::Plugin::Quiz
   include Robut::Plugin
   
   def usage
-    [ 
+    [ "#{at_nick} ask 'Should we break for lunch?'",
       "#{at_nick} ask polar 'Should I continue the presentation?' for 3 minutes",
     ]
   end
@@ -29,7 +29,7 @@ class Robut::Plugin::Quiz
     
   end
   
-  QUESTION_REGEX = /^ask ?(choice|polar|scale)? (?:question )?.+(?:(?:for )?(\d+) minutes?)$/
+  QUESTION_REGEX = /^ask ?(choice|polar|scale)? (?:question )?(?:(?:for )?(\d+) minutes?)?(.+)$/
   
   def is_a_valid_question? message
     QUESTION_REGEX =~ message
@@ -67,9 +67,10 @@ class Robut::Plugin::Quiz
     
     request =~ QUESTION_REGEX
     type = Regexp.last_match(1) || 'polar'
-    question_length = Regexp.last_match(2) || '2' 
+    question_length = Regexp.last_match(2) || '2'
+    question_data = Regexp.last_match(3)
     
-    set_current_question create_the_question_based_on_type(type,sender,request), question_length
+    set_current_question create_the_question_based_on_type(type,sender,question_data), question_length
   end
   
   #

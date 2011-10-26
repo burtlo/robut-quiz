@@ -3,7 +3,7 @@ require_relative 'spec_helper'
 describe Robut::Plugin::Quiz::Polar do
   
   subject do
-    Robut::Plugin::Quiz::Polar.new 'person',"ask polar 'Should I continue the presentation?' for 3 minutes"
+    Robut::Plugin::Quiz::Polar.new 'person',"'Should I continue the presentation?'"
   end
   
   let(:time) { Time.now }

@@ -15,11 +15,11 @@ describe Robut::Plugin::Quiz do
   let(:time) { Time.now }
   
   [ 
-    "ask choice 'What do you want for lunch?', 'pizza', 'sandwich', 'salad' for 1 minute",
-    "ask polar 'Should I continue the presentation?' for 3 minutes",
-    "ask scale question 'how much did you like the presentation?', '1..5' for 10 minutes",
-    "ask 'Should I continue the presentation?', 'y|yes', 'n|no' for 1 minutes",
-    "ask polar 'Should I continue the presentation?' for 3 minutes"
+    "ask 'Should I continue the presentation?'",
+    "ask for 3 minutes 'Should I continue the presentation?'",
+    "ask polar for 3 minutes 'Should I continue the presentation?'",
+    "ask choice 1 minute 'What do you want for lunch?', 'pizza', 'sandwich', 'salad'",
+    "ask scale question for 10 minutes 'how much did you like the presentation?', '1..5'"
     
   ].each do |question|
   
@@ -55,7 +55,7 @@ describe Robut::Plugin::Quiz do
 
           subject.should_not_receive(:process_response_for_active_question)
           
-          subject.handle time,'person',"@quizmaster ask polar 'Should I continue the presentation?' for 3 minutes"
+          subject.handle time,'person',"@quizmaster ask polar for 3 minutes 'Should I continue the presentation?'"
           
         end
         
@@ -70,7 +70,7 @@ describe Robut::Plugin::Quiz do
 
           subject.should_receive(:process_response_for_active_question)
           
-          subject.handle time,'person',"@quizmaster ask polar 'Should I continue the presentation?' for 3 minutes"
+          subject.handle time,'person',"@quizmaster ask polar for 3 minutes 'Should I continue the presentation?'"
           
         end
         
@@ -93,7 +93,7 @@ describe Robut::Plugin::Quiz do
         subject.should_receive(:create_the_question_based_on_type).and_return(expected_question)
         
         subject.should_receive(:set_current_question).with(expected_question,'3')
-        subject.process_the_question 'person',"ask polar 'Should I continue the presentation?' for 3 minutes"
+        subject.process_the_question 'person',"ask polar for 3 minutes 'Should I continue the presentation?'"
         
       end
       
@@ -109,7 +109,7 @@ describe Robut::Plugin::Quiz do
     end
     
     let(:question) do
-      Robut::Plugin::Quiz::Polar.new 'person',"ask polar 'Should I continue the presentation?' for 3 minutes"
+      Robut::Plugin::Quiz::Polar.new 'person',"'Should I continue the presentation?'"
     end
     
     it "should place robut in the mode where it is asking a question" do

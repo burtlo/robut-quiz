@@ -32,10 +32,6 @@ class Robut::Plugin::Quiz::Polar
     "#{yes_votes} YES vote#{yes_votes != 1 ? 's' : ''} and #{no_votes} NO vote#{no_votes != 1 ? 's' : ''}"
   end
   
-  def captured_results
-    @captured_results ||= {}
-  end
-  
   def store_positive_response_for sender_nick
     captured_results[sender_nick] = true
   end
