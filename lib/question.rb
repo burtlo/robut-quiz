@@ -32,7 +32,7 @@ module Robut::Plugin::Quiz::Question
     @question = parsed_elements.first.first
     # After the target, question type, question, and answer length has been determined
     # look at all the single quoted items to find the list of parameters if there are any
-    @parameters = parsed_elements[1..-1].flatten
+    @parameters = Array(parsed_elements[1..-1].flatten)
     
   end
   

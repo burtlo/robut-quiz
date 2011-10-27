@@ -40,7 +40,7 @@ class Robut::Plugin::Quiz
     
   end
   
-  QUESTION_REGEX = /^ask ?(choice|polar|scale)? (?:question )?(?:(?:for )?(\d+) minutes?)?(.+)$/
+  QUESTION_REGEX = /^ask ?(choice|polar|range)? (?:question )?(?:(?:for )?(\d+) minutes?)?(.+)$/
   
   def is_a_valid_question? message
     QUESTION_REGEX =~ message
@@ -136,7 +136,7 @@ class Robut::Plugin::Quiz
   # @param [String] response is the answer to the question proposed.
   #
   def process_response_for_active_question(sender_nick, response)
-    if @@current_question.handle_response sender_nick, response
+    if @@current_question.handle_response sender_nick, response[/^answer (.+)$/,1]
       reply "Thank you, @#{sender_nick}, I have recorded your response."
     else
       reply "Sorry, @#{sender_nick}, I was unable to record that answer"
@@ -148,3 +148,4 @@ end
 
 require_relative 'question'
 require_relative 'polar'
+require_relative 'range'
