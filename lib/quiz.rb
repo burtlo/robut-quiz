@@ -4,13 +4,23 @@ require 'robut'
 class Robut::Plugin::Quiz
   include Robut::Plugin
   
+  #
+  # @return [Array<String>] contains the various types of responses that are 
+  #   valid usage examples that would be returned by the Help Plugin
+  # 
   def usage
     [ 
       "#{at_nick} ask 'Should we break for lunch?'",
       "#{at_nick} ask for 3 minutes 'Should I continue the presentation?'",
+      "#{at_nick} answer yes"
     ]
   end
   
+  #
+  # @param [Time] time at which the message has arrived
+  # @param [String] sender_nick the sender
+  # @param [String] message the message that was sent
+  #
   def handle(time, sender_nick, message)
     
     # check to see if the user is asking the bot a question
@@ -71,8 +81,11 @@ class Robut::Plugin::Quiz
     defined? @@current_question and @@current_question
   end
   
+  #
+  # @param [String] sender the user proposing the question
+  # @param [String] request the data related to the asking and the question data itself.
+  #
   def process_the_question(sender,request)
-    
     request =~ QUESTION_REGEX
     type = Regexp.last_match(1) || 'polar'
     question_length = Regexp.last_match(2) || '2'
@@ -104,6 +117,9 @@ class Robut::Plugin::Quiz
     reply "The results are in for '#{question}':"
     reply question.results
     
+    # allow some time between the results and asking the next question
+    sleep 10
+    
   end
   
   def start_accepting_responses_for_this_question(question)
@@ -114,8 +130,13 @@ class Robut::Plugin::Quiz
     @@current_question = nil
   end
   
-  def process_response_for_active_question(sender_nick, request)
-    if @@current_question.handle_response sender_nick, request
+  #
+  # @param [String] sender_nick the name of the person that is responding to
+  #   the question.
+  # @param [String] response is the answer to the question proposed.
+  #
+  def process_response_for_active_question(sender_nick, response)
+    if @@current_question.handle_response sender_nick, response
       reply "Thank you, @#{sender_nick}, I have recorded your response."
     else
       reply "Sorry, @#{sender_nick}, I was unable to record that answer"
