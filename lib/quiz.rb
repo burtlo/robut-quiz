@@ -5,8 +5,9 @@ class Robut::Plugin::Quiz
   include Robut::Plugin
   
   def usage
-    [ "#{at_nick} ask 'Should we break for lunch?'",
-      "#{at_nick} ask polar 'Should I continue the presentation?' for 3 minutes",
+    [ 
+      "#{at_nick} ask 'Should we break for lunch?'",
+      "#{at_nick} ask for 3 minutes 'Should I continue the presentation?'",
     ]
   end
   
@@ -45,8 +46,15 @@ class Robut::Plugin::Quiz
     (store["quiz::question::queue"] ||= []) << [sender,question]
   end
   
+  #
+  # Return a new thread which will pop questions in the queue of questions
+  # 
   def quizmaster
-    @@quizmaster ||= Thread.new { pop_the_question until there_are_no_more_questions_to_pop }
+    if not defined?(@@quizmaster) or @@quizmaster.nil? or !@@quizmaster.alive?
+      @@quizmaster = Thread.new { pop_the_question until there_are_no_more_questions_to_pop }
+    end
+    
+    @@quizmaster
   end
   
   def pop_the_question
