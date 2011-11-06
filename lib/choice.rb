@@ -3,6 +3,10 @@
 class Robut::Plugin::Quiz::Choice
   include Robut::Plugin::Quiz::Question
   
+  def ask
+    "@all Question '#{@question}' (#{@parameters.map {|p| "'#{p}'" }.join("/")})"
+  end
+  
   def handle_response(sender_nick,response)
     
     if a_valid_choice response
