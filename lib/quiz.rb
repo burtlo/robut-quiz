@@ -149,3 +149,4 @@ end
 require_relative 'question'
 require_relative 'polar'
 require_relative 'range'
+require_relative 'choice'
