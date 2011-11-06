@@ -13,12 +13,12 @@ A Plugin for [Robut](https://github.com/justinweiss/robut) that allows you to as
    user_a  > @robut answer YES
    user_b  > @robut answer yes
    user_c  > @robut answer n
-   robut   > @all The results are in for 'Do you want to go to the bar at 4:30?:'
+   robut   > @all The results are in for 'Do you want to go to the bar at 4:30?':
              2 YES votes and 1 NO vote
 ```
 
 
-### Scale Questions (Range) 
+### Scale/Range Questions
 
 ```
    user_a  > @robut ask range 'How much did you like the bar we went to last week?' 1..10
@@ -27,8 +27,21 @@ A Plugin for [Robut](https://github.com/justinweiss/robut) that allows you to as
    user_a  > @robut answer 1
    user_b  > @robut answer 5
    user_c  > @robut answer 10
-   robut   > @all The results are in for 'How much did you like the bar we went to last week?:'
+   robut   > @all The results are in for 'How much did you like the bar we went to last week?':
              3 votes with a mean of 5.333333
+```
+
+### Choice Questions
+
+```
+   user_a  > @robut ask choice 'What drink should I order?' 'PBR', 'Martini', 'Bourbon'
+   robut   > @user I have enqueued your question
+   robut   > @all Question 'What drink should I order?' (1..10)
+   user_a  > @robut answer PBR
+   user_b  > @robut answer Martini
+   user_c  > @robut answer Martini
+   robut   > @all The results are in for 'What drink should I order?':
+             1 'PBR', 2 'Martini'
 ```
 
 ## Installation
