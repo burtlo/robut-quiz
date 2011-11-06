@@ -1,3 +1,7 @@
+=== 0.2.1 / 2011-11-06
+
+* Added a choice question 'a', 'b', or 'c'
+
 === 0.2.0 / 2011-10-26
 
 * Changed the question syntax
